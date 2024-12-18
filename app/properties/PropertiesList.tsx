@@ -13,6 +13,7 @@ interface Property {
     title: string;
     developer: string;
     place: string;
+    developer_logo_new: string;
     development_price_from: number;
     development_price_to: number;
     image_gallery: string[];
@@ -28,6 +29,7 @@ export function PropertiesList({ initialData }: { initialData: Property[] }) {
       developer_slug,
       minPrice,
       maxPrice,
+      developer_logo_new,
       amenities,
       sortBy,
       sortOrder,
@@ -53,6 +55,7 @@ export function PropertiesList({ initialData }: { initialData: Property[] }) {
             body: JSON.stringify({
               place_slug,
               developer_slug,
+              developer_logo_new,
               minPrice,
               maxPrice,
               amenities,

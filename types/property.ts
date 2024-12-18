@@ -8,6 +8,7 @@ export interface Property {
     id: string;
     title: string;
     developer: string;
+    developer_logo_new?: string;
     place: string;
     development_price_from: number;
     development_price_to: number;

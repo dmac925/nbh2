@@ -26,6 +26,7 @@ export async function POST(request: Request) {
   if (onlyWithUnits) {
     query = query.gt('available_units_count', 0);
   }
+  
 
   // Sorting
   query = query.order(sortBy, { ascending: sortOrder === 'asc' });
@@ -34,6 +35,8 @@ export async function POST(request: Request) {
   query = query.range(offset, offset + limit - 1);
 
   const { data, error, count } = await query;
+  console.log(data) 
+  
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
@@ -52,6 +55,7 @@ export async function POST(request: Request) {
       min_price: prop.min_available_unit_price
     } : null
   }));
+  console.log(propertiesWithUnits)
 
   return NextResponse.json({
     data: propertiesWithUnits,

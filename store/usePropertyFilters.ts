@@ -5,6 +5,7 @@ interface PropertyFilters {
   developer_slug: string | null;
   minPrice: number | null;
   maxPrice: number | null;
+  developer_logo_new: string | null;
   amenities: string[];
   sortBy: string;
   sortOrder: 'asc' | 'desc';
