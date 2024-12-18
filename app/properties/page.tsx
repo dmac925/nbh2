@@ -1,10 +1,9 @@
-// app/properties/page.tsx (Server Component)
+// app/properties/page.tsx
 import { supabase } from '@/lib/supabaseClient';
 import { FilterControls } from './FilterControls';
 import { PropertiesList } from './PropertiesList';
 
 export default async function PropertiesPage() {
-  // Initial fetch with aggregated data:
   const { data: initialProperties, error } = await supabase
     .from('properties_with_unit_info')
     .select('*')
@@ -16,12 +15,13 @@ export default async function PropertiesPage() {
   }
 
   return (
-    <div>
-      <h1>Properties</h1>
-      {/* FilterControls is a Client Component for user input */}
-      <FilterControls />
-      {/* Pass initial data to a Client Component to handle updates */}
-      <PropertiesList initialData={initialProperties ?? []} />
+    <div className="relative pt-16"> {/* Add padding-top to account for fixed header */}
+      <div className="sticky top-16 z-40"> {/* Position sticky below header */}
+        <FilterControls />
+      </div>
+      <div className="container mx-auto px-4">
+        <PropertiesList initialData={initialProperties ?? []} />
+      </div>
     </div>
   );
 }
