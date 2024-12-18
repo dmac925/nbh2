@@ -17,7 +17,7 @@ export default async function PropertiesPage() {
       {/* FilterControls is a Client Component for user input */}
       <FilterControls />
       {/* Pass initial data to a Client Component to handle updates */}
-      <PropertiesList initialData={initialProperties} />
+      <PropertiesList initialData={initialProperties ?? []} />
     </div>
   );
 }
