@@ -64,24 +64,39 @@ export function PropertyCard({ property }: { property: Property }) {
               onTouchMove={handleTouchMove}
               onTouchEnd={handleTouchEnd}
             >
-              <Image 
-                src={images[currentImageIndex]}
-                alt={`${title || 'Property'} - Image ${currentImageIndex + 1}`}
-                fill
-                className="object-cover"
-                priority={false}
-              />
+              <div 
+                className="absolute flex transition-transform duration-300 ease-in-out w-full h-full"
+                style={{ 
+                  transform: `translateX(-${currentImageIndex * 100}%)`,
+                  width: `${images.length * 100}%`
+                }}
+              >
+                {images.map((image, index) => (
+                  <div 
+                    key={index} 
+                    className="relative w-full h-full flex-shrink-0"
+                  >
+                    <Image 
+                      src={image}
+                      alt={`${title || 'Property'} - Image ${index + 1}`}
+                      fill
+                      className="object-cover"
+                      priority={false}
+                    />
+                  </div>
+                ))}
+              </div>
               
               {/* Developer Logo */}
               {developer_logo_new && (
-  <div className="absolute bottom-2 right-2 bg-white/90 p-1 rounded">
-    <img 
-      src={developer_logo_new}
-      alt={developer || 'Developer logo'}
-      className="h-5 w-auto object-contain"
-    />
-  </div>
-)}
+                <div className="absolute bottom-2 right-2 bg-white/90 p-1 rounded">
+                  <img 
+                    src={developer_logo_new}
+                    alt={developer || 'Developer logo'}
+                    className="h-5 w-auto object-contain"
+                  />
+                </div>
+              )}
               
               {/* Image Counter */}
               <div className="absolute top-2 left-2 bg-white/90 px-2 py-1 rounded text-xs">
@@ -106,7 +121,6 @@ export function PropertyCard({ property }: { property: Property }) {
                 </>
               )}
             </div>
-            
           </div>
         </CardHeader>
         <CardContent className="p-4">
