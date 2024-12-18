@@ -1,6 +1,7 @@
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Home } from "lucide-react";
 import { Property } from "@/types/property";
+import { Badge } from "@/components/ui/badge";
 
 export function PropertyCard({ property }: { property: Property }) {
     const {
@@ -9,7 +10,8 @@ export function PropertyCard({ property }: { property: Property }) {
       place,
       development_price_from,
       development_price_to,
-      image_gallery
+      image_gallery,
+      units_summary
     } = property;
   
     const priceText = development_price_from && development_price_to 
@@ -48,6 +50,19 @@ export function PropertyCard({ property }: { property: Property }) {
               <span className="text-sm">{place}</span>
             </div>
           )}
+{units_summary && (
+  <div className="mt-2 space-y-2">
+    <Badge variant="secondary" className="mr-2">
+      {units_summary.available_count} {units_summary.available_count === 1 ? 'Unit' : 'Units'} Available
+    </Badge>
+    {units_summary.min_price && (
+      <div className="text-sm text-muted-foreground">
+        From £{units_summary.min_price.toLocaleString()}
+        {units_summary.bedrooms ? ` • ${units_summary.bedrooms} ${units_summary.bedrooms === 1 ? 'Bedroom' : 'Bedrooms'}` : ''}
+      </div>
+    )}
+  </div>
+)}
         </CardContent>
         <CardFooter className="p-4 pt-0">
           <span className="text-lg font-bold text-primary">{priceText}</span>

@@ -4,12 +4,16 @@ import { FilterControls } from './FilterControls';
 import { PropertiesList } from './PropertiesList';
 
 export default async function PropertiesPage() {
-  // Initial, no filter fetch:
-  const { data: initialProperties } = await supabase
-    .from('properties')
+  // Initial fetch with aggregated data:
+  const { data: initialProperties, error } = await supabase
+    .from('properties_with_unit_info')
     .select('*')
     .order('development_price_from', { ascending: true })
     .limit(50);
+
+  if (error) {
+    console.error('Error fetching initial properties:', error.message);
+  }
 
   return (
     <div>

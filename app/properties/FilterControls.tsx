@@ -16,7 +16,8 @@ export function FilterControls() {
     amenities, toggleAmenity,
     sortBy, setSortBy,
     sortOrder, setSortOrder,
-    applyFilters
+    applyFilters,
+    onlyWithUnits, setOnlyWithUnits
   } = usePropertyFilters();
 
   const handleSortChange = (newSortBy: string) => {
@@ -118,6 +119,25 @@ export function FilterControls() {
               />
             </div>
           </div>
+
+          <div className="space-y-2">
+  <div className="flex items-center space-x-2">
+    <Checkbox
+      id="available-units"
+      checked={onlyWithUnits}
+      onCheckedChange={(checked) => {
+        setOnlyWithUnits(checked as boolean);
+        applyFilters();
+      }}
+    />
+    <label 
+      htmlFor="available-units" 
+      className="text-sm font-medium leading-none"
+    >
+      Show only properties with available units
+    </label>
+  </div>
+</div>
 
           <div className="space-y-2">
             <Label>Amenities</Label>

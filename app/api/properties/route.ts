@@ -1,17 +1,19 @@
+// app/api/properties/route.ts
 import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabaseClient';
 
 export async function POST(request: Request) {
   const { 
-    place_slug, developer_slug, minPrice, maxPrice, amenities, sortBy, sortOrder, page, limit 
+    place_slug, developer_slug, minPrice, maxPrice, amenities, 
+    sortBy = 'development_price_from', sortOrder = 'asc', 
+    page = 1, limit = 20, onlyWithUnits = false
   } = await request.json();
 
-  const pageSize = limit || 20; 
-  const currentPage = page || 1;
-  const offset = (currentPage - 1) * pageSize;
+  const offset = (page - 1) * limit;
 
-  let query = supabase.from('properties').select('*', { count: 'exact' });
+  let query = supabase.from('properties_with_unit_info').select('*', { count: 'exact' });
 
+  // Filters
   if (place_slug) query = query.eq('place_slug', place_slug);
   if (developer_slug) query = query.eq('developer_slug', developer_slug);
   if (minPrice) query = query.gte('development_price_from', minPrice);
@@ -19,21 +21,42 @@ export async function POST(request: Request) {
   if (amenities && amenities.length > 0) {
     query = query.contains('amenities', amenities);
   }
-  
-  if (sortBy) {
-    if (sortBy === 'development_price_from') {
-      // Handle price sorting
-      query = query.order('development_price_from', { ascending: sortOrder === 'asc' });
-    } else if (sortBy === 'title') {
-      // Handle title sorting
-      query = query.order('title', { ascending: sortOrder === 'asc' });
-    }
+
+  // Only show properties that have available units if requested
+  if (onlyWithUnits) {
+    query = query.gt('available_units_count', 0);
   }
 
-  query = query.range(offset, offset + pageSize - 1);
+  // Sorting
+  query = query.order(sortBy, { ascending: sortOrder === 'asc' });
+
+  // Pagination
+  query = query.range(offset, offset + limit - 1);
 
   const { data, error, count } = await query;
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-  return NextResponse.json({ data, count, page: currentPage, pageSize });
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
+  // The data already has aggregated info:
+  //   available_units_count
+  //   min_available_unit_price
+  // No need for extra queries.
+
+  // Format the response as needed (for example, create a `units_summary` field)
+  const propertiesWithUnits = data.map(prop => ({
+    ...prop,
+    units_summary: prop.available_units_count > 0 ? {
+      available_count: prop.available_units_count,
+      min_price: prop.min_available_unit_price
+    } : null
+  }));
+
+  return NextResponse.json({
+    data: propertiesWithUnits,
+    count,
+    page,
+    pageSize: limit
+  });
 }

@@ -34,7 +34,8 @@ export function PropertiesList({ initialData }: { initialData: Property[] }) {
       appliedFiltersVersion,
       page,
       pageSize,
-      setPage
+      setPage,
+      onlyWithUnits
     } = usePropertyFilters();
   
     useEffect(() => {
@@ -44,30 +45,32 @@ export function PropertiesList({ initialData }: { initialData: Property[] }) {
     }, [appliedFiltersVersion, page]);
   
     async function fetchProperties() {
-      setIsLoading(true);
-      try {
-        const res = await fetch('/api/properties', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            place_slug,
-            developer_slug,
-            minPrice,
-            maxPrice,
-            amenities,
-            sortBy,
-            sortOrder,
-            page,
-            limit: pageSize
-          })
-        });
-        const { data, count } = await res.json();
-        setProperties(data);
-        setTotalCount(count);
-      } finally {
-        setIsLoading(false);
+        setIsLoading(true);
+        try {
+          const res = await fetch('/api/properties', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              place_slug,
+              developer_slug,
+              minPrice,
+              maxPrice,
+              amenities,
+              sortBy,
+              sortOrder,
+              page,
+              limit: pageSize,
+              onlyWithUnits 
+            })
+          });
+      
+          const { data, count } = await res.json();
+          setProperties(data);
+          setTotalCount(count);
+        } finally {
+          setIsLoading(false);
+        }
       }
-    }
   
     const totalPages = totalCount ? Math.ceil(totalCount / pageSize) : 1;
   

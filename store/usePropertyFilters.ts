@@ -10,15 +10,19 @@ interface PropertyFilters {
   sortOrder: 'asc' | 'desc';
   page: number;
   pageSize: number;
+  
 
   // A version or a boolean to indicate when user applies filters
   appliedFiltersVersion: number; 
+
+  onlyWithUnits: boolean;
 
   setPlaceSlug: (val: string | null) => void;
   setDeveloperSlug: (val: string | null) => void;
   setMinPrice: (val: number | null) => void;
   setMaxPrice: (val: number | null) => void;
   setAmenities: (vals: string[]) => void;
+  setOnlyWithUnits: (value: boolean) => void;
   toggleAmenity: (val: string) => void;
   setSortBy: (val: string) => void;
   setSortOrder: (val: 'asc' | 'desc') => void;
@@ -33,6 +37,7 @@ export const usePropertyFilters = create<PropertyFilters>((set) => ({
   minPrice: null,
   maxPrice: null,
   amenities: [],
+  onlyWithUnits: false,
   sortBy: 'development_price_from',
   sortOrder: 'asc',
   appliedFiltersVersion: 0,
@@ -53,6 +58,7 @@ export const usePropertyFilters = create<PropertyFilters>((set) => ({
     }
     return { amenities: Array.from(current) };
   }),
+  setOnlyWithUnits: (value) => set({ onlyWithUnits: value }),
   setSortBy: (val) => set({ sortBy: val }),
   setSortOrder: (val) => set({ sortOrder: val }),
 
