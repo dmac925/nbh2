@@ -42,7 +42,7 @@ export const usePropertyFilters = create<PropertyFilters>((set) => ({
   sortOrder: 'asc',
   appliedFiltersVersion: 0,
   page: 1,
-  pageSize: 20,
+  pageSize: 16,
 
   setPlaceSlug: (val) => set({ place_slug: val }),
   setDeveloperSlug: (val) => set({ developer_slug: val }),

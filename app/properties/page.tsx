@@ -9,7 +9,7 @@ export default async function PropertiesPage() {
     .from('properties_with_unit_info')
     .select('*')
     .order('development_price_from', { ascending: true })
-    .limit(50);
+    .limit(16);
 
   if (error) {
     console.error('Error fetching initial properties:', error.message);

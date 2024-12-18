@@ -6,7 +6,7 @@ export async function POST(request: Request) {
   const { 
     place_slug, developer_slug, minPrice, maxPrice, amenities, 
     sortBy = 'development_price_from', sortOrder = 'asc', 
-    page = 1, limit = 20, onlyWithUnits = false
+    page = 1, limit = 16, onlyWithUnits = false
   } = await request.json();
 
   const offset = (page - 1) * limit;
