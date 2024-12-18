@@ -29,7 +29,6 @@ export function PropertiesList({ initialData }: { initialData: Property[] }) {
       developer_slug,
       minPrice,
       maxPrice,
-      developer_logo_new,
       amenities,
       sortBy,
       sortOrder,
@@ -55,7 +54,6 @@ export function PropertiesList({ initialData }: { initialData: Property[] }) {
             body: JSON.stringify({
               place_slug,
               developer_slug,
-              developer_logo_new,
               minPrice,
               maxPrice,
               amenities,
