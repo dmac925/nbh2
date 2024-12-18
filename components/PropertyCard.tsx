@@ -93,27 +93,27 @@ export function PropertyCard({ property }: { property: Property }) {
     <Card className="group transition-all duration-300 hover:shadow-lg">
       <CardHeader className="p-0">
         <div className="relative aspect-[4/3] w-full overflow-hidden rounded-t-lg" ref={containerRef}>
-          <div
-            className="relative h-full flex transition-transform duration-300 ease-out"
-            style={{
-              transform: `translateX(${currentTranslate}px)`,
-              transition: isDragging ? 'none' : 'transform 0.3s ease-out'
-            }}
-            onTouchStart={handleTouchStart}
-            onTouchMove={handleTouchMove}
-            onTouchEnd={handleTouchEnd}
-          >
-            {images.map((imgSrc, idx) => (
-              <div key={idx} className="relative w-full flex-shrink-0 h-full">
-                <Image
-                  src={imgSrc}
-                  alt={`${title || 'Property'} - Image ${idx + 1}`}
-                  fill
-                  className="object-cover"
-                />
-              </div>
-            ))}
-          </div>
+        <div 
+  className="relative h-full flex transition-transform duration-300 ease-out touch-pan-x"
+  style={{
+    transform: `translateX(${currentTranslate}px)`,
+    transition: isDragging ? 'none' : 'transform 0.3s ease-out'
+  }}
+  onTouchStart={handleTouchStart}
+  onTouchMove={handleTouchMove}
+  onTouchEnd={handleTouchEnd}
+>
+  {images.map((imgSrc, idx) => (
+    <div key={idx} className="relative w-full flex-shrink-0 h-full">
+      <Image
+        src={imgSrc}
+        alt={`${title || 'Property'} - Image ${idx + 1}`}
+        fill
+        className="object-cover"
+      />
+    </div>
+  ))}
+</div>
           
           {developer_logo_new && (
             <div className="absolute bottom-2 right-2 bg-white/90 p-1 rounded">
