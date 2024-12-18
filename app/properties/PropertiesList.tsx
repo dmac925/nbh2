@@ -1,88 +1,120 @@
+// app/properties/PropertiesList.tsx
 'use client';
 
 import { useState, useEffect } from 'react';
 import { usePropertyFilters } from '@/store/usePropertyFilters';
+import { PropertyCard } from '@/components/PropertyCard';
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+
 
 interface Property {
-  id: number;
-  title: string;
-  development_price_from: number;
-  // ... other fields
+    id: string;
+    title: string;
+    developer: string;
+    place: string;
+    development_price_from: number;
+    development_price_to: number;
+    image_gallery: string[];
 }
 
 export function PropertiesList({ initialData }: { initialData: Property[] }) {
-  const [properties, setProperties] = useState<Property[]>(initialData);
-  const [totalCount, setTotalCount] = useState<number | null>(null); // track total number of results
-
-  const {
-    place_slug,
-    developer_slug,
-    minPrice,
-    maxPrice,
-    amenities,
-    sortBy,
-    sortOrder,
-    appliedFiltersVersion,
-    page,
-    pageSize,
-    setPage
-  } = usePropertyFilters();
-
-  useEffect(() => {
-    if (appliedFiltersVersion > 0) {
-      fetchProperties();
+    const [properties, setProperties] = useState<Property[]>(initialData);
+    const [totalCount, setTotalCount] = useState<number | null>(null);
+    const [isLoading, setIsLoading] = useState(false);
+  
+    const {
+      place_slug,
+      developer_slug,
+      minPrice,
+      maxPrice,
+      amenities,
+      sortBy,
+      sortOrder,
+      appliedFiltersVersion,
+      page,
+      pageSize,
+      setPage
+    } = usePropertyFilters();
+  
+    useEffect(() => {
+      if (appliedFiltersVersion > 0) {
+        fetchProperties();
+      }
+    }, [appliedFiltersVersion, page]);
+  
+    async function fetchProperties() {
+      setIsLoading(true);
+      try {
+        const res = await fetch('/api/properties', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            place_slug,
+            developer_slug,
+            minPrice,
+            maxPrice,
+            amenities,
+            sortBy,
+            sortOrder,
+            page,
+            limit: pageSize
+          })
+        });
+        const { data, count } = await res.json();
+        setProperties(data);
+        setTotalCount(count);
+      } finally {
+        setIsLoading(false);
+      }
     }
-  }, [appliedFiltersVersion, page]); // run fetch when filters are applied or page changes
-
-  async function fetchProperties() {
-    const res = await fetch('/api/properties', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        place_slug,
-        developer_slug,
-        minPrice,
-        maxPrice,
-        amenities,
-        sortBy,
-        sortOrder,
-        page,
-        limit: pageSize
-      })
-    });
-    const { data, count } = await res.json();
-    setProperties(data);
-    setTotalCount(count);
-  }
-
-  // If you want initialData to be paginated too, you should fetch it server-side 
-  // with the same pagination logic or simply re-fetch on mount.
-  // For now, assume initialData is just a first-page or blank state.
-
-  const totalPages = totalCount && Math.ceil(totalCount / pageSize);
-
-  return (
-    <div>
-      <div className="property-list">
-        {properties.map((prop) => (
-          <div key={prop.id} className="property-card">
-            <h2>{prop.title}</h2>
-            <p>From: £{prop.development_price_from}</p>
-          </div>
-        ))}
-      </div>
-
-      {totalPages && totalPages > 1 && (
-        <div className="pagination">
-          <button disabled={page <= 1} onClick={() => setPage(page - 1)}>
-            Previous
-          </button>
-          <span>Page {page} of {totalPages}</span>
-          <button disabled={page >= totalPages} onClick={() => setPage(page + 1)}>
-            Next
-          </button>
+  
+    const totalPages = totalCount ? Math.ceil(totalCount / pageSize) : 1;
+  
+    return (
+      <div className="px-4 py-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {isLoading ? (
+            Array.from({ length: pageSize }).map((_, idx) => (
+              <Card key={idx} className="animate-pulse">
+                <div className="aspect-[4/3] bg-muted rounded-t-lg" />
+                <CardContent className="p-4">
+                  <div className="h-4 w-3/4 bg-muted rounded mb-2" />
+                  <div className="h-4 w-1/2 bg-muted rounded" />
+                </CardContent>
+              </Card>
+            ))
+          ) : (
+            properties.map((prop) => (
+              <PropertyCard key={prop.id} property={prop} />
+            ))
+          )}
         </div>
-      )}
-    </div>
-  );
-}
+  
+        {totalPages > 1 && (
+          <div className="mt-8 flex justify-center gap-2">
+            <Button
+              variant="outline"
+              disabled={page <= 1 || isLoading}
+              onClick={() => setPage(page - 1)}
+            >
+              Previous
+            </Button>
+            <Button
+              variant="outline"
+              disabled={true}
+            >
+              Page {page} of {totalPages}
+            </Button>
+            <Button
+              variant="outline"
+              disabled={page >= totalPages || isLoading}
+              onClick={() => setPage(page + 1)}
+            >
+              Next
+            </Button>
+          </div>
+        )}
+      </div>
+    );
+  }

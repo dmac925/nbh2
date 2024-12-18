@@ -21,7 +21,13 @@ export async function POST(request: Request) {
   }
   
   if (sortBy) {
-    query = query.order(sortBy, { ascending: sortOrder === 'asc' });
+    if (sortBy === 'development_price_from') {
+      // Handle price sorting
+      query = query.order('development_price_from', { ascending: sortOrder === 'asc' });
+    } else if (sortBy === 'title') {
+      // Handle title sorting
+      query = query.order('title', { ascending: sortOrder === 'asc' });
+    }
   }
 
   query = query.range(offset, offset + pageSize - 1);
