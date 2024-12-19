@@ -3,75 +3,68 @@
 
 import { useState, useEffect } from 'react';
 import { usePropertyFilters } from '@/store/usePropertyFilters';
+import { Property } from '@/types/property';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { PropertyCard } from '@/components/PropertyCard';
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-
-
-interface Property {
-    id: string;
-    title: string;
-    developer: string;
-    place: string;
-    developer_logo_new: string;
-    development_price_from: number;
-    development_price_to: number;
-    image_gallery: string[];
-}
 
 export function PropertiesList({ initialData }: { initialData: Property[] }) {
-    const [properties, setProperties] = useState<Property[]>(initialData);
-    const [totalCount, setTotalCount] = useState<number | null>(null);
-    const [isLoading, setIsLoading] = useState(false);
+  const [properties, setProperties] = useState<Property[]>(initialData);
+  const [totalCount, setTotalCount] = useState<number | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const {
+    latitude,
+    longitude,
+    radiusMiles,
+    developer_slug,
+    minPrice,
+    maxPrice,
+    amenities,
+    sortBy,
+    sortOrder,
+    appliedFiltersVersion,
+    page,
+    pageSize,
+    onlyWithUnits,
+    setPage
+  } = usePropertyFilters();
+
+  useEffect(() => {
+    if (appliedFiltersVersion > 0) {
+      fetchProperties();
+    }
+  }, [appliedFiltersVersion, page]);
+
+  async function fetchProperties() {
+    setIsLoading(true);
+    try {
+      const res = await fetch('/api/properties', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          latitude,
+          longitude,
+          radiusMiles,
+          developer_slug,
+          minPrice,
+          maxPrice,
+          amenities,
+          sortBy,
+          sortOrder,
+          page,
+          limit: pageSize,
+          onlyWithUnits 
+        })
+      });
   
-    const {
-      place_slug,
-      developer_slug,
-      minPrice,
-      maxPrice,
-      amenities,
-      sortBy,
-      sortOrder,
-      appliedFiltersVersion,
-      page,
-      pageSize,
-      setPage,
-      onlyWithUnits
-    } = usePropertyFilters();
-  
-    useEffect(() => {
-      if (appliedFiltersVersion > 0) {
-        fetchProperties();
-      }
-    }, [appliedFiltersVersion, page]);
-  
-    async function fetchProperties() {
-        setIsLoading(true);
-        try {
-          const res = await fetch('/api/properties', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              place_slug,
-              developer_slug,
-              minPrice,
-              maxPrice,
-              amenities,
-              sortBy,
-              sortOrder,
-              page,
-              limit: pageSize,
-              onlyWithUnits 
-            })
-          });
-      
-          const { data, count } = await res.json();
-          setProperties(data);
-          setTotalCount(count);
-        } finally {
-          setIsLoading(false);
-        }
-      }
+      const { data, count } = await res.json();
+      setProperties(data);
+      setTotalCount(count);
+    } finally {
+      setIsLoading(false);
+    }
+  }
   
     const totalPages = totalCount ? Math.ceil(totalCount / pageSize) : 1;
   

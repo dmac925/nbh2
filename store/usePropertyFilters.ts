@@ -17,6 +17,11 @@ interface PropertyFilters {
 
   onlyWithUnits: boolean;
 
+  latitude: number | null;
+  longitude: number | null;
+  radiusMiles: number | null;
+  
+
   setPlaceSlug: (val: string | null) => void;
   setDeveloperSlug: (val: string | null) => void;
   setMinPrice: (val: number | null) => void;
@@ -29,6 +34,9 @@ interface PropertyFilters {
   applyFilters: () => void;
   setPage: (page: number) => void;
   setPageSize: (size: number) => void;
+  setLatitude: (val: number | null) => void;
+  setLongitude: (val: number | null) => void;
+  setRadiusMiles: (val: number | null) => void;
 }
 
 export const usePropertyFilters = create<PropertyFilters>((set) => ({
@@ -43,12 +51,18 @@ export const usePropertyFilters = create<PropertyFilters>((set) => ({
   appliedFiltersVersion: 0,
   page: 1,
   pageSize: 16,
+  latitude: null,
+  longitude: null,
+  radiusMiles: null,
 
   setPlaceSlug: (val) => set({ place_slug: val }),
   setDeveloperSlug: (val) => set({ developer_slug: val }),
   setMinPrice: (val) => set({ minPrice: val }),
   setMaxPrice: (val) => set({ maxPrice: val }),
   setAmenities: (vals) => set({ amenities: vals }),
+  setLatitude: (val) => set({ latitude: val }),
+  setLongitude: (val) => set({ longitude: val }),
+  setRadiusMiles: (val) => set({ radiusMiles: val }),
   toggleAmenity: (val) => set((state) => {
     const current = new Set(state.amenities);
     if (current.has(val)) {
@@ -61,8 +75,6 @@ export const usePropertyFilters = create<PropertyFilters>((set) => ({
   setOnlyWithUnits: (value) => set({ onlyWithUnits: value }),
   setSortBy: (val) => set({ sortBy: val }),
   setSortOrder: (val) => set({ sortOrder: val }),
-
-  // Increment the version to signal filters have been "applied"
   applyFilters: () => set((state) => ({ appliedFiltersVersion: state.appliedFiltersVersion + 1 })),
   setPage: (page) => set({ page }),
   setPageSize: (size) => set({ pageSize: size })

@@ -1,7 +1,7 @@
 'use client';
 
 import { usePropertyFilters } from '@/store/usePropertyFilters';
-import { Search, ArrowUpDown, SlidersHorizontal } from 'lucide-react';
+import { Search, ArrowUpDown, SlidersHorizontal, Home } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -11,6 +11,8 @@ import {
 } from "@/components/ui/popover";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
+import { LocationInput } from '@/components/FilterInputs';
+import { Switch } from "@/components/ui/switch";
 
 export function FilterControls() {
   const {
@@ -22,7 +24,8 @@ export function FilterControls() {
     sortBy, setSortBy,
     sortOrder, setSortOrder,
     applyFilters,
-    onlyWithUnits, setOnlyWithUnits
+    onlyWithUnits, setOnlyWithUnits,
+    setLatitude, setLongitude, setRadiusMiles,
   } = usePropertyFilters();
 
   const handleSortChange = (newSortBy: string) => {
@@ -38,21 +41,40 @@ export function FilterControls() {
   return (
     <div className="w-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="flex items-center gap-2 p-4 border-b">
-        {/* Search */}
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            placeholder="Search by location..."
-            value={place_slug || ''}
-            onChange={(e) => {
-              setPlaceSlug(e.target.value || null);
+        {/* Location search container with max width */}
+        <div className="max-w-md flex-1">
+          <LocationInput
+            value={JSON.stringify({ address: '', longitude: 0, latitude: 0, radius: '' })}
+            onChange={(locationData) => {
+              setLatitude(locationData.latitude);
+              setLongitude(locationData.longitude);
+              const radiusInMiles = locationData.radius ? (Number(locationData.radius) / 1609.34) : 0;
+              setRadiusMiles(radiusInMiles);
               applyFilters();
             }}
-            className="pl-9"
+            placeholder="Search for a UK address..."
           />
         </div>
 
-        {/* Sort Buttons */}
+        {/* Available Units Toggle with explicit ON/OFF state */}
+        <div className="flex items-center gap-2 px-3 py-2 border rounded-md bg-background">
+          <Home className="h-4 w-4 text-muted-foreground" />
+          <span className="text-sm font-medium">Available Units</span>
+          <div className="flex items-center gap-2">
+            <Switch
+              checked={onlyWithUnits}
+              onCheckedChange={(checked) => {
+                setOnlyWithUnits(checked);
+                applyFilters();
+              }}
+            />
+            <span className={`text-xs font-medium ${onlyWithUnits ? 'text-primary' : 'text-muted-foreground'}`}>
+              {onlyWithUnits ? 'ON' : 'OFF'}
+            </span>
+          </div>
+        </div>
+
+        {/* Price sort button */}
         <Button
           variant={sortBy === 'development_price_from' ? 'default' : 'outline'}
           onClick={() => handleSortChange('development_price_from')}
@@ -66,25 +88,12 @@ export function FilterControls() {
           )}
         </Button>
 
-        <Button
-          variant={sortBy === 'title' ? 'default' : 'outline'}
-          onClick={() => handleSortChange('title')}
-          className="gap-2"
-        >
-          Title
-          {sortBy === 'title' && (
-            <ArrowUpDown className={`h-4 w-4 transition-transform ${
-              sortOrder === 'desc' ? 'rotate-180' : ''
-            }`} />
-          )}
-        </Button>
-
-        {/* Filters Popover */}
+        {/* Filters button */}
         <Popover>
           <PopoverTrigger asChild>
             <Button variant="outline" className="gap-2">
               <SlidersHorizontal className="h-4 w-4" />
-              Filters
+              More Filters
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-80">
@@ -125,20 +134,6 @@ export function FilterControls() {
                       applyFilters();
                     }}
                   />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="available-units"
-                    checked={onlyWithUnits}
-                    onCheckedChange={(checked) => {
-                      setOnlyWithUnits(checked as boolean);
-                      applyFilters();
-                    }}
-                  />
-                  <Label htmlFor="available-units">Show only properties with available units</Label>
                 </div>
               </div>
 
